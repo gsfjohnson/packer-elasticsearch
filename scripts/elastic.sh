@@ -5,22 +5,29 @@ set -e
 # not used anymore.. will be upgrading to 2.1 asap
 elasticsearch_version=$ELASTIC_VERSION
 
-cd /tmp
-curl -L -o elastic.rpm https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/rpm/elasticsearch/${ELASTIC_VERSION}/elasticsearch-${ELASTIC_VERSION}.rpm
-sudo rpm -Uvh elastic.rpm
-rm elastic.rpm
+echo "Import Elasticsearch Key..."
+rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
 
-cd /usr/share/elasticsearch
-sudo chown elasticsearch:elasticsearch -R .
+echo "Create repo definition..."
+cat <<EOF >/etc/yum.repos.d/elasticsearch.repo
+[elasticsearch-2.x]
+name=Elasticsearch repository for 2.x packages
+baseurl=https://packages.elastic.co/elasticsearch/2.x/centos
+gpgcheck=1
+gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+EOF
 
-# install aws plugin
-sudo yum install -y expect
-sudo chmod +x /tmp/config/awsplugin.sh
-/tmp/config/awsplugin.sh
+echo "Installing elasticsearch..."
+yum -y install elasticsearch expect
 
-echo "elasticsearch health check"
-mv /tmp/config/check.py /etc/consul.d/
+echo "Start elasticsearh on boot..."
+chkconfig elasticsearch on
+
+echo "Install cloud-aws plugin..."
+/usr/share/elasticsearch/bin/plugin install cloud-aws -b
 
 echo "elasticsearch config"
 sudo mkdir -p /etc/elasticsearch/configurable
 mv /tmp/config/* /etc/elasticsearch/configurable
+

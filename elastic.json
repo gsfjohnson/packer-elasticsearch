@@ -3,16 +3,14 @@
     "aws_access_key": "",
     "aws_secret_key": "",
     "aws_security_token": "",
-    "aws_region": "ap-southeast-2",
-    "aws_build_regions": "ap-southeast-2",
-    "aws_source_ami": "ami-69631053",
+    "aws_region": "us-west-2",
+    "aws_build_regions": "us-west-2",
+    "aws_source_ami": "ami-63b25203",
     "aws_instance_type": "t2.medium",
     "aws_vpc_id": "",
     "aws_subnet_id": "",
     "ami_name_prefix": "elasticsearch",
-    "elastic_version": "2.2.0",
-    "consul_version": "0.6.3",
-    "consul_template_version": "0.12.1"
+    "elastic_version": "2.2.0"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -33,20 +31,6 @@
     {
       "type": "shell",
       "script": "scripts/default.sh",
-      "execute_command": "echo 'ec2-user' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/java.sh",
-      "execute_command": "echo 'ec2-user' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
-    },
-    {
-      "type": "shell",
-      "script": "scripts/consul.sh",
-      "environment_vars": [
-            "CONSUL_VERSION={{user `consul_version`}}",
-            "CONSUL_TEMPLATE_VERSION={{user `consul_template_version`}}"
-        ],
       "execute_command": "echo 'ec2-user' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
     },
     {
